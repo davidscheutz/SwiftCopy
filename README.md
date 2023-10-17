@@ -1,3 +1,11 @@
+<p>
+    <img src="https://img.shields.io/badge/Swift-5.9-orange.svg" />
+    <a href="https://swift.org/package-manager">
+        <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
+    </a>
+    <img src="https://img.shields.io/badge/platforms-macOS | iOS | tvOS | watchOS" alt="Platforms: macOS, iOS, tvOS, watchOS" />
+</p>
+
 # SwiftCopy
 
 SwiftCopy is a Swift Package that provides a convenient, Kotlin-like way to copy immutable instances of Swift structs.
