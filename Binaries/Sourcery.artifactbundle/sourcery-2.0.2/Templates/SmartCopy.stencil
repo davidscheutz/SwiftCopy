@@ -1,0 +1,52 @@
+// Template name: SwiftCopy
+// Template version: 1.0
+
+import Foundation
+
+public enum OptionalCopy<T> {
+    case update(T)
+    case reset
+    case noChange
+    
+    public static func use<T>(_ value: T?) -> OptionalCopy<T> {
+        if let value {
+            return .update(value)
+        } else {
+            return .reset
+        }
+    }
+    
+    internal func update(using current: T?) -> T? {
+        switch self {
+            case .update(let new): return new
+            case .reset: return nil
+            case .noChange: return current
+        }
+    }
+}
+
+{% for type in types.based.Copyable %}
+{% if type.variables.count > 0 %}
+extension {{ type.name }} {
+    public func copy(
+        {% for property in type.variables|instance|!computed %}
+        {% ifnot property.isOptional %}
+        {{ property.name }}: {{ property.typeName }}? = nil{% ifnot forloop.last %}, {% endif %}
+        {% else %}
+        {{ property.name }}: OptionalCopy<{{ property.typeName.unwrappedTypeName }}> = .noChange{% ifnot forloop.last %}, {% endif %}
+        {% endif %}
+        {% endfor %}
+    ) -> {{ type.name }} {
+        return {{ type.name }}(
+            {% for property in type.variables|instance|!computed %}
+            {% ifnot property.isOptional %}
+            {{ property.name }}: {{ property.name }} ?? self.{{ property.name }}{% ifnot forloop.last %}, {% endif %}
+            {% else %}
+            {{ property.name }}: {{ property.name }}.update(using: self.{{ property.name }}){% ifnot forloop.last %}, {% endif %}
+            {% endif %}
+            {% endfor %}
+        )
+    }
+}
+{% endif %}
+{% endfor %}
