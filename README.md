@@ -81,6 +81,20 @@ Select your Project -> Your Target -> Build Phases -> Add CodeGeneratorPlugin (S
 
 Feel free to take a look at the `SwiftCopyDemo.xcodeproj` to see the library in action.
 
+## Contributing
+
+Contributions to SwiftCopy are welcomed and encouraged!
+
+It is easy to get involved. Open an issue to discuss a new feature, write clean code, show some love using unit tests and open a Pull Request.
+
+A list of contributors will be available through GitHub.
+
+PS: Check the open issues and pull requests for existing discussions.
+
+## License
+
+SwiftCopy is available under the MIT license. See [LICENSE](https://github.com/davidscheutz/SwiftCopy/blob/master/LICENSE) for more information.
+
 ## Credit
 
 This project uses [Sourcery](https://github.com/krzysztofzablocki/Sourcery) for the code generation.
