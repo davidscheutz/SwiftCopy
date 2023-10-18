@@ -32,4 +32,9 @@ final class SwiftCopyDemoTests: XCTestCase {
         
         XCTAssertEqual(user.copy(profilePicture: .use(nil)), user)
     }
+    
+    func test_copyOnlyStoredProperties() {
+        let user = User3(id: UUID().hashValue)
+        XCTAssertEqual(user.copy(id: "123"), User3(id: "123"))
+    }
 }
