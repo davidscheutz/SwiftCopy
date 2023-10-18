@@ -1,14 +1,12 @@
-<p>
-    <img src="https://img.shields.io/badge/Swift-5.9-orange.svg" />
-    <a href="https://swift.org/package-manager">
-        <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
-    </a>
-    <img src="https://img.shields.io/badge/platforms-macOS | iOS | tvOS | watchOS" alt="Platforms: macOS, iOS, tvOS, watchOS" />
-</p>
+![Supports iOS](https://img.shields.io/badge/iOS-Supported-blue.svg)
+![Supports macOS](https://img.shields.io/badge/macOS-Supported-blue.svg)
+![Supports watchOS](https://img.shields.io/badge/watchOS-Supported-blue.svg)
+![SwiftPM Compatible](https://img.shields.io/badge/SwiftPM-Compatible-brightgreen.svg)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 # SwiftCopy
 
-SwiftCopy is a Swift Package that provides a convenient, Kotlin-like way to copy immutable instances of Swift structs.
+A Swift Package that provides a convenient, Kotlin-like way to copy immutable instances of Swift types such as `struct`.
 
 ## Usage
 
@@ -28,7 +26,7 @@ let myUser = User(id: "123", firstName: "David", lastName: "Scheutz", created = 
 let updatedUser = myUser.copy(firstName: "Your", lastName: "Name")
 ```
 
-### Optional Properties Support
+#### Optional Properties Support
 
 `SwiftCopy` wraps optional properties using the `OptionalCopy` enum providing explicit control over how to update or reset it's state.
 
@@ -62,7 +60,7 @@ _ = myUser.copy(profilePicture: .use(optionalValue))
 
 ## Installation
 
-### 1. Swift Package Manager
+#### 1. Add Swift Package
 You can use the [Swift Package Manager](https://swift.org/package-manager/) to install `SwiftCopy` by adding it as a dependency to your `Package.swift` file:
 
 ```swift
@@ -73,11 +71,11 @@ dependencies: [
 
 Make sure to add `SwiftCopy` as a dependency to your Target.
 
-### 2. Add SwiftCopy CodeGeneratorPlugin as Build Tool Plugin
+#### 2. Add SwiftCopy CodeGeneratorPlugin as Build Tool Plugin
 
 Select your Project -> Your Target -> Build Phases -> Add CodeGeneratorPlugin (SwiftCopy)
 
-// TODO: Insert screenshot  
+<img width="571" alt="Screenshot 2023-10-17 at 21 29 47" src="https://github.com/davidscheutz/SwiftCopy/assets/14020916/215b75f0-f557-41dd-b89b-1fb3378df4ab">
 
 ## Demo Project
 
