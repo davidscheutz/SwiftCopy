@@ -13,17 +13,18 @@ A Swift Package that provides a convenient, Kotlin-like way to copy immutable in
 Simply conform your structs to the `Copyable` protocol.
  
 ```swift
-struct User: Copyable {
+struct State: Copyable {
     let id: Int
-    let firstName: String
-    let lastName: String
-    let created: Date
+    let text: String
+    let isLoading: Bool
 }
 
-let myUser = User(id: "123", firstName: "David", lastName: "Scheutz", created = .now)
+let intial = State(id: "123", text: "", isLoading: false)   // id: "123", text: "",  isLoading: false
 
-// Copy the instance by changing the `firstName` and `lastName` properties
-let updatedUser = myUser.copy(firstName: "Your", lastName: "Name")
+let updated = intial.copy(text: "hello")    // id: "123", text: "hello",  isLoading: false 
+
+let loading = updated.copy(isLoading: true) // id: "123", text: "hello",  isLoading: true
+
 ```
 
 #### Optional Properties Support
