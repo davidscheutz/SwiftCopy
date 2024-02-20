@@ -2,7 +2,7 @@ import Foundation
 import PackagePlugin
 
 @main
-struct CodeGeneratorPlugin: BuildToolPlugin {
+struct SwiftCopyCodeGeneratorPlugin: BuildToolPlugin {
     func createBuildCommands (context: PluginContext, target: Target) throws -> [Command] {
         []
     }
@@ -11,7 +11,7 @@ struct CodeGeneratorPlugin: BuildToolPlugin {
 #if canImport (XcodeProjectPlugin)
 import XcodeProjectPlugin
 
-extension CodeGeneratorPlugin: XcodeBuildToolPlugin {
+extension SwiftCopyCodeGeneratorPlugin: XcodeBuildToolPlugin {
     func createBuildCommands(context: XcodeProjectPlugin.XcodePluginContext, target: XcodeProjectPlugin.XcodeTarget) throws -> [PackagePlugin.Command] {
         [
             try sourcery(target: target, in: context)

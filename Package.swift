@@ -7,7 +7,7 @@ let package = Package(
     name: "SwiftCopy",
     products: [
         .library(name: "SwiftCopy", targets: ["SwiftCopy"]),
-        .plugin(name: "CodeGeneratorPlugin", targets: ["CodeGeneratorPlugin"])
+        .plugin(name: "SwiftCopyCodeGeneratorPlugin", targets: ["SwiftCopyCodeGeneratorPlugin"])
     ],
     dependencies: [],
     targets: [
@@ -16,7 +16,7 @@ let package = Package(
             dependencies: []
         ),
         .plugin(
-            name: "CodeGeneratorPlugin",
+            name: "SwiftCopyCodeGeneratorPlugin",
             capability: .buildTool(),
             dependencies: [
                 .target(name: "sourcery")
