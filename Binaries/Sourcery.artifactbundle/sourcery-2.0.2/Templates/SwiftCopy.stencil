@@ -8,7 +8,7 @@ public enum OptionalCopy<T> {
     case reset
     case noChange
     
-    public static func use<T>(_ value: T?) -> OptionalCopy<T> {
+    public static func use(_ value: T?) -> OptionalCopy<T> {
         if let value {
             return .update(value)
         } else {
