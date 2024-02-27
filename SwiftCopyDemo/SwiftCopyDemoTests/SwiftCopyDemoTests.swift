@@ -35,6 +35,6 @@ final class SwiftCopyDemoTests: XCTestCase {
     
     func test_copyOnlyStoredProperties() {
         let user = User3(id: UUID().hashValue)
-        XCTAssertEqual(user.copy(id: "123"), User3(id: "123"))
+        XCTAssertEqual(user.copy(id: 123), User3(id: 123))
     }
 }

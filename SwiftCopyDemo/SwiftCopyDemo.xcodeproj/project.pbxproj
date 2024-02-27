@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B936DCAC2B8E85230087AA5F /* SwiftCopy in Frameworks */ = {isa = PBXBuildFile; productRef = B936DCAB2B8E85230087AA5F /* SwiftCopy */; };
 		B96291312ADE8BCD00BB9032 /* SwiftCopyDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96291302ADE8BCD00BB9032 /* SwiftCopyDemoApp.swift */; };
 		B96291332ADE8BCD00BB9032 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96291322ADE8BCD00BB9032 /* ContentView.swift */; };
 		B96291352ADE8BCF00BB9032 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B96291342ADE8BCF00BB9032 /* Assets.xcassets */; };
@@ -45,6 +46,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B96291432ADE8BFB00BB9032 /* SwiftCopy in Frameworks */,
+				B936DCAC2B8E85230087AA5F /* SwiftCopy in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,11 +138,12 @@
 			buildRules = (
 			);
 			dependencies = (
-				B96291452ADE8C0300BB9032 /* PBXTargetDependency */,
+				B936DCAE2B8E85300087AA5F /* PBXTargetDependency */,
 			);
 			name = SwiftCopyDemo;
 			packageProductDependencies = (
 				B96291422ADE8BFB00BB9032 /* SwiftCopy */,
+				B936DCAB2B8E85230087AA5F /* SwiftCopy */,
 			);
 			productName = SwiftCopyDemo;
 			productReference = B962912D2ADE8BCD00BB9032 /* SwiftCopyDemo.app */;
@@ -192,6 +195,9 @@
 				Base,
 			);
 			mainGroup = B96291242ADE8BCD00BB9032;
+			packageReferences = (
+				B936DCAA2B8E85230087AA5F /* XCLocalSwiftPackageReference ".." */,
+			);
 			productRefGroup = B962912E2ADE8BCD00BB9032 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -243,9 +249,9 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		B96291452ADE8C0300BB9032 /* PBXTargetDependency */ = {
+		B936DCAE2B8E85300087AA5F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B96291442ADE8C0300BB9032 /* CodeGeneratorPlugin */;
+			productRef = B936DCAD2B8E85300087AA5F /* SwiftCopyCodeGeneratorPlugin */;
 		};
 		B96291512ADE8CC900BB9032 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -521,14 +527,25 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		B936DCAA2B8E85230087AA5F /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
-		B96291422ADE8BFB00BB9032 /* SwiftCopy */ = {
+		B936DCAB2B8E85230087AA5F /* SwiftCopy */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftCopy;
 		};
-		B96291442ADE8C0300BB9032 /* CodeGeneratorPlugin */ = {
+		B936DCAD2B8E85300087AA5F /* SwiftCopyCodeGeneratorPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = "plugin:CodeGeneratorPlugin";
+			productName = "plugin:SwiftCopyCodeGeneratorPlugin";
+		};
+		B96291422ADE8BFB00BB9032 /* SwiftCopy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftCopy;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
