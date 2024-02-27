@@ -19,12 +19,14 @@ struct State: Copyable {
     let isLoading: Bool
 }
 
-let intial = State(id: "123", text: "", isLoading: false)   // id: "123", text: "",  isLoading: false
+let intial = State(id: "123", text: "", isLoading: false)
+// id: "123", text: "", isLoading: false
 
-let updated = intial.copy(text: "hello")    // id: "123", text: "hello",  isLoading: false 
+let updated = intial.copy(text: "hello")
+// id: "123", text: "hello", isLoading: false 
 
-let loading = updated.copy(isLoading: true) // id: "123", text: "hello",  isLoading: true
-
+let loading = updated.copy(isLoading: true)
+// id: "123", text: "hello", isLoading: true
 ```
 
 #### Optional Properties Support
@@ -74,7 +76,7 @@ Make sure to add `SwiftCopy` as a dependency to your Target.
 
 #### 2. Add SwiftCopy CodeGeneratorPlugin as Build Tool Plugin
 
-Select your Project -> Your Target -> Build Phases -> Add CodeGeneratorPlugin (SwiftCopy)
+Select your Project -> Your Target -> Build Phases -> Add SwiftCopyCodeGeneratorPlugin (SwiftCopy)
 
 <img width="571" alt="Screenshot 2023-10-17 at 21 29 47" src="https://github.com/davidscheutz/SwiftCopy/assets/14020916/215b75f0-f557-41dd-b89b-1fb3378df4ab">
 
