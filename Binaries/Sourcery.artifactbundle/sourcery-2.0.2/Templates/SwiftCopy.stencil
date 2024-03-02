@@ -48,5 +48,24 @@ extension {{ type.name }} {
         )
     }
 }
+
+class {{ type.name }}Builder {
+{% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+    private var {{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %}
+    
+    func with({{ property.name }}: {{ property.typeName }}{% if property.isOptional %} = nil{% endif %}) -> Self {
+        self.{{ property.name }} = {{ property.name }}
+        return self
+    }
+{% endfor %}
+
+    func build() -> {{ type.name }} {
+        {{ type.name }}(
+            {%- for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+            {{ property.name }}: {{ property.name }}{% ifnot forloop.last %}, {% endif %}
+            {% endfor -%}
+        )
+    }
+}
 {% endif %}
 {% endfor %}
