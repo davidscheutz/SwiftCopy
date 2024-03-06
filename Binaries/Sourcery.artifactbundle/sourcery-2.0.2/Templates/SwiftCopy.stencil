@@ -70,7 +70,13 @@ class {{ type.name }}Builder {
 
 import SwiftUI
 
-final class {{ type.name }}Updater {
+protocol {{ type.name }}Bindable {
+    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+    var {{ property.name }}: Binding<{{ property.typeName }}> { get }
+    {% endfor %}
+}
+
+final class {{ type.name }}Updater: {{ type.name }}Bindable {
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
     lazy private(set) var {{ property.name }}: Binding<{{ property.typeName }}> = .init(
         get: { self._{{ property.name }} },
