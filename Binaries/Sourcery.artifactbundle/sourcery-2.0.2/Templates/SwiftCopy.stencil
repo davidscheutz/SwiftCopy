@@ -51,10 +51,15 @@ extension {{ type.name }} {
 
 class {{ type.name }}Builder {
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
-    private var {{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %}
+    private var _{{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %}
+    
+    lazy private(set) var {{ property.name }}: Binding<{{ property.typeName }}{% ifnot property.isOptional %}?{% endif %}> = .init(
+        get: { self._{{ property.name }} },
+        set: { self._{{ property.name }} = $0 }
+    )
     
     func with({{ property.name }}: {{ property.typeName }}{% if property.isOptional %} = nil{% endif %}) -> Self {
-        self.{{ property.name }} = {{ property.name }}
+        self._{{ property.name }} = {{ property.name }}
         return self
     }
     {% endfor %}
@@ -62,7 +67,7 @@ class {{ type.name }}Builder {
     func build() -> {{ type.name }} {
         {{ type.name }}(
             {%- for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
-            {{ property.name }}: {{ property.name }}{% ifnot forloop.last %}, {% endif %}
+            {{ property.name }}: _{{ property.name }}{% ifnot forloop.last %}, {% endif %}
             {% endfor -%}
         )
     }
