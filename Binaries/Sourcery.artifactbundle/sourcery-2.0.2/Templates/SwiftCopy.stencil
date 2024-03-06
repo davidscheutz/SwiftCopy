@@ -50,19 +50,45 @@ extension {{ type.name }} {
 }
 
 class {{ type.name }}Builder {
-{% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
     private var {{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %}
     
     func with({{ property.name }}: {{ property.typeName }}{% if property.isOptional %} = nil{% endif %}) -> Self {
         self.{{ property.name }} = {{ property.name }}
         return self
     }
-{% endfor %}
+    {% endfor %}
 
     func build() -> {{ type.name }} {
         {{ type.name }}(
             {%- for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
             {{ property.name }}: {{ property.name }}{% ifnot forloop.last %}, {% endif %}
+            {% endfor -%}
+        )
+    }
+}
+
+import SwiftUI
+
+final class {{ type.name }}Updater {
+    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+    lazy private(set) var {{ property.name }}: Binding<{{ property.typeName }}> = .init(
+        get: { self._{{ property.name }} },
+        set: { self._{{ property.name }} = $0 }
+    )
+    private var _{{ property.name }}: {{ property.typeName }}
+    {% endfor %}
+
+    init({{ type.name|lowerFirstLetter }}: {{ type.name }}) {
+    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+        _{{ property.name }} = {{ type.name|lowerFirstLetter }}.{{ property.name }}
+    {% endfor %}
+    }
+    
+    func build() -> {{ type.name }} {
+        {{ type.name }}(
+            {%- for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+            {{ property.name }}: _{{ property.name }}{% ifnot forloop.last %}, {% endif %}
             {% endfor -%}
         )
     }
