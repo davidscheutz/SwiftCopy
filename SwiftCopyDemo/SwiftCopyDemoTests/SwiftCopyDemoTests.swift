@@ -33,6 +33,57 @@ final class SwiftCopyDemoTests: XCTestCase {
         XCTAssertEqual(user.copy(profilePicture: .use(nil)), user)
     }
     
+    func test_builder() throws {
+        let id1 = UUID().hashValue
+        let id2 = UUID().hashValue
+        
+        let builder = User2Builder()
+        
+        XCTAssertFalse(builder.readyToBuild())
+        
+        do {
+            _ = try builder.buildSafely()
+            XCTFail("Expected to fail")
+        } catch {}
+        
+        builder.with(id: id1)
+        
+        XCTAssertFalse(builder.readyToBuild())
+        
+        builder.id = id2
+        
+        builder.name = "Name 1"
+        builder.with(name: "Name 2")
+        
+        XCTAssertTrue(builder.readyToBuild())
+        
+        let user = builder.build()
+        
+        XCTAssertEqual(user, .init(id: id2, name: "Name 2", profilePicture: nil))
+    }
+    
+    func test_updated() {
+        let id1 = UUID().hashValue
+        let id2 = UUID().hashValue
+        let initialUser = User2(id: id1, name: "Test User", profilePicture: nil)
+        
+        let updater = User2Updater(user2: initialUser)
+        
+        var updatedUser = updater.build()
+        
+        XCTAssertEqual(initialUser, updatedUser)
+        
+        updater.with(id: id2)
+        
+        updater.with(name: "Updated Name")
+        
+        updater.profilePicture = "https://test.url"
+        
+        updatedUser = updater.build()
+        
+        XCTAssertEqual(updatedUser, .init(id: id2, name: "Updated Name", profilePicture: "https://test.url"))
+    }
+    
     func test_copyOnlyStoredProperties() {
         let user = User3(id: UUID().hashValue)
         XCTAssertEqual(user.copy(id: 123), User3(id: 123))
