@@ -62,7 +62,7 @@ final class {{ type.name }}Builder: ObservableObject {
             objectWillChange.send()
         }
     }
-    
+    @discardableResult
     func with({{ property.name }}: {{ property.typeName }}) -> Self {
         _{{ property.name }} = {{ property.name }}
         return self
@@ -73,6 +73,14 @@ final class {{ type.name }}Builder: ObservableObject {
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" and property.isOptional == false %}
         _{{ property.name }} != nil{% ifnot forloop.last %} &&{% endif %}
     {% endfor %}
+    }
+    
+    func buildSafely() throws -> {{ type.name }} {
+        guard readyToBuild() else {
+            // TODO: improve by providing which values are missing
+            throw NSError(domain: "Can't create instance of '{{ type.name }}', not all required values have been provided.", code: 0)
+        }
+        return build()
     }
     
     func build() -> {{ type.name }} {
@@ -94,6 +102,7 @@ protocol {{ type.name }}Changeable: ObservableObject {
 
 final class {{ type.name }}Updater: {{ type.name }}Changeable {
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+    private var _{{ property.name }}: {{ property.typeName }}
     var {{ property.name }}: {{ property.typeName }} {
         get { _{{ property.name }} }
         set {
@@ -101,7 +110,11 @@ final class {{ type.name }}Updater: {{ type.name }}Changeable {
             objectWillChange.send()
         }
     }
-    private var _{{ property.name }}: {{ property.typeName }}
+    @discardableResult
+    func with({{ property.name }}: {{ property.typeName }}) -> Self {
+        _{{ property.name }} = {{ property.name }}
+        return self
+    }
     {% endfor %}
 
     init({{ type.name|lowerFirstLetter }}: {{ type.name }}) {
