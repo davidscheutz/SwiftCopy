@@ -6,40 +6,57 @@
 
 # SwiftCopy
 
-A Swift Package that provides a convenient, Kotlin-like way to copy immutable instances of Swift types such as `struct`.
+A Swift Package that provides convenient copy functionality for immutable `struct`'s in Swift using code generation.
+
+**Immutability - Why bother?**
+
+Thread-safety, as they can't be modified after creation.
+
+Predictability, makes debugging and reasoning about state changes easier. 
+
+Essential for unidirectional data flow architecture and Functional Programming. 
 
 ## Usage
 
 Simply conform your structs to the `Copyable` protocol.
  
 ```swift
-struct State: Copyable {
+struct Example: Copyable {
     let id: Int
-    let text: String
+    let input: String
     let isLoading: Bool
 }
+```
 
-let intial = State(id: "123", text: "", isLoading: false)
-// id: "123", text: "", isLoading: false
+### - Copy
 
-let updated = intial.copy(text: "hello")
-// id: "123", text: "hello", isLoading: false 
+Build your project and you a `copy` method will be generated.
+
+```swift
+let intial = Example(id: "123", input: "", isLoading: false)
+// id: "123", input: "", isLoading: false
+
+let updated = intial.copy(input: "hello")
+// id: "123", input: "hello", isLoading: false 
 
 let loading = updated.copy(isLoading: true)
-// id: "123", text: "hello", isLoading: true
+// id: "123", input: "hello", isLoading: true
 ```
 
 #### Optional Properties Support
 
-`SwiftCopy` wraps optional properties using the `OptionalCopy` enum providing explicit control over how to update or reset it's state.
+`SwiftCopy` wraps optional properties using the `OptionalCopy` enum providing control over how to update or reset it's value.
+
+Available options are:
 
 ```swift
-public enum OptionalCopy<T> {
-    case update(T)
-    case reset
-    case noChange // default value used by the copy function
-}
+update(T)
+use(T?)
+reset
+noChange
 ```
+
+Example:
 
 ```swift
 struct User: Copyable {
@@ -47,19 +64,86 @@ struct User: Copyable {
     let name: String
     let profilePicture: String?
 }
+```
 
+```swift
 let myUser = User(id: "123", name: "David", profilePicture: nil)
 
-// Copy the instance by setting the `profilePicture`
+// Assign a value to `profilePicture`
 _ = myUser.copy(profilePicture: .update("https://dave.com/pictures/214381"))
 
-// Copy the instance by resetting the `profilePicture`
+// Reset `profilePicture`
 _ = myUser.copy(profilePicture: .reset)
 
-// Copy the instance by using an optional type directly
+// Copy the instance by using an optional type
 let optionalValue: String? = "Value"
 _ = myUser.copy(profilePicture: .use(optionalValue))
 ```
+
+### - Builder
+
+Used to collect values required to instantiate your `struct`. Especially useful for object being created using user input.
+
+```swift
+struct OnboardingUser: Copyable {
+    let firstName: String
+    let lastName: String
+    let username: String
+    let dateOfBirth: Date
+}
+```
+
+Compile your project and a `OnboardingUserBuilder` will be generated for you. 
+
+The builder can be used as followed:
+
+**Builder pattern**
+
+```swift
+let builder = OnboardingUserBuilder()
+
+let user = builder
+    .with(firstName: "David")
+    .with(lastName: "Scheutz")
+    // ...
+    .build()
+```
+
+**Assign directly**
+
+```swift
+let builder = OnboardingUserBuilder()
+
+builder.firstName = "David"
+builder.lastName = "Scheutz"
+// ...
+let user = builder.build()
+```
+
+Note: The `build()` method force unwraps optional types and therefore will crash if a required value is missing. To avoid this you can either use `readyToBuild()` to check first or use `buildSafely()`, which will throw an exception.
+
+### - Updater
+
+Similar to the Builder, this object can be used to mutate an existing struct.
+
+```swift
+let updater = OnboardingUserUpdater(onboardingUser: existingUser)
+
+let updatedUser = updater
+    .with(firstName: "David New")
+    ...
+    .build()
+```
+
+```swift
+let updater = OnboardingUserUpdater(onboardingUser: existingUser)
+
+updater.with(firstName: "David")
+...
+let updatedUser = builder.build()
+```
+
+Note: The `build()` method is safe to use, as all values are present at all times, due to the Updated being instantiated with an existing object. 
 
 ## Installation
 
