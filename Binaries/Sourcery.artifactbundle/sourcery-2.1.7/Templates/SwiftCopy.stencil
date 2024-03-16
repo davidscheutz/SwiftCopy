@@ -25,6 +25,8 @@ public enum OptionalCopy<T> {
     }
 }
 
+import SwiftUI
+
 {% for type in types.based.Copyable %}
 {% if type.variables.count > 0 %}
 extension {{ type.name }} {
@@ -49,21 +51,30 @@ extension {{ type.name }} {
     }
 }
 
-class {{ type.name }}Builder {
+final class {{ type.name }}Builder: ObservableObject {
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
     private var _{{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %}
     
-    lazy private(set) var {{ property.name }}: Binding<{{ property.typeName }}{% ifnot property.isOptional %}?{% endif %}> = .init(
-        get: { self._{{ property.name }} },
-        set: { self._{{ property.name }} = $0 }
-    )
+    var {{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}?{% endif %} {
+        get { _{{ property.name }} }
+        set {
+            _{{ property.name }} = newValue
+            objectWillChange.send()
+        }
+    }
     
-    func with({{ property.name }}: {{ property.typeName }}{% if property.isOptional %} = nil{% endif %}) -> Self {
-        self._{{ property.name }} = {{ property.name }}
+    func with({{ property.name }}: {{ property.typeName }}) -> Self {
+        _{{ property.name }} = {{ property.name }}
         return self
     }
     {% endfor %}
 
+    func readyToBuild() -> Bool {
+    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" and property.isOptional == false %}
+        _{{ property.name }} != nil{% ifnot forloop.last %} &&{% endif %}
+    {% endfor %}
+    }
+    
     func build() -> {{ type.name }} {
         {{ type.name }}(
             {%- for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
@@ -73,20 +84,23 @@ class {{ type.name }}Builder {
     }
 }
 
-import SwiftUI
+import Combine
 
-protocol {{ type.name }}Bindable {
+protocol {{ type.name }}Changeable: ObservableObject {
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
-    var {{ property.name }}: Binding<{{ property.typeName }}> { get }
+    var {{ property.name }}: {{ property.typeName }} { get set }
     {% endfor %}
 }
 
-final class {{ type.name }}Updater: {{ type.name }}Bindable {
+final class {{ type.name }}Updater: {{ type.name }}Changeable {
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
-    lazy private(set) var {{ property.name }}: Binding<{{ property.typeName }}> = .init(
-        get: { self._{{ property.name }} },
-        set: { self._{{ property.name }} = $0 }
-    )
+    var {{ property.name }}: {{ property.typeName }} {
+        get { _{{ property.name }} }
+        set {
+            _{{ property.name }} = newValue
+            objectWillChange.send()
+        }
+    }
     private var _{{ property.name }}: {{ property.typeName }}
     {% endfor %}
 
