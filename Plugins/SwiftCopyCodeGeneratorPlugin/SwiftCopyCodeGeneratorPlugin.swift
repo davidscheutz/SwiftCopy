@@ -22,25 +22,34 @@ extension SwiftCopyCodeGeneratorPlugin: XcodeBuildToolPlugin {
         let toolPath = try context.tool(named: "sourcery")
         let templatesPath = toolPath.path.removingLastComponent().removingLastComponent().appending("Templates")
         
-        let sourceryCommand = Command.prebuildCommand(
-            displayName: "Sourcery Generate \(target.displayName)",
+        return command(
+            for: target,
             executable: toolPath.path,
+            templates: templatesPath.string,
+            root: context.xcodeProject.directory,
+            output: context.pluginWorkDirectory
+        )
+    }
+    
+    private func command(for target: XcodeTarget, executable: Path, templates: String, root: Path, output: Path) -> Command {
+        Command.prebuildCommand(
+            displayName: "SwiftCopy generate: \(target.displayName)",
+            executable: executable,
             arguments: [
                 "--templates",
-                templatesPath,
+                templates,
                 "--args",
                 "imports=[\"\(target.displayName)\"]",
                 "--sources",
-                context.xcodeProject.directory,
+                root.appending(subpath: target.displayName),
                 "--output",
-                context.pluginWorkDirectory,
+                output,
                 "--disableCache",
                 "--verbose"
             ],
             environment: [:],
-            outputFilesDirectory: context.pluginWorkDirectory
+            outputFilesDirectory: output
         )
-        return sourceryCommand
     }
 }
 #endif

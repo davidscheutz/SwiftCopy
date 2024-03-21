@@ -2,6 +2,11 @@
 // Template version: 1.0
 
 import Foundation
+{% macro includeImports type %}
+    {% for import in type.imports %}
+import {{ import }}
+    {% endfor %}
+{% endmacro %}
 
 public enum OptionalCopy<T> {
     case update(T)
@@ -29,13 +34,17 @@ import SwiftUI
 
 {% for type in types.based.Copyable %}
 {% if type.variables.count > 0 %}
+{% call includeImports type %}
+        
 extension {{ type.name }} {
+    public typealias {{ type.name }}OptionalCopy<T> = OptionalCopy<T>
+    
     public func copy(
         {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
         {% ifnot property.isOptional %}
         {{ property.name }}: {{ property.typeName }}? = nil{% ifnot forloop.last %}, {% endif %}
         {% else %}
-        {{ property.name }}: OptionalCopy<{{ property.typeName.unwrappedTypeName }}> = .noChange{% ifnot forloop.last %}, {% endif %}
+        {{ property.name }}: {{ type.name }}OptionalCopy<{{ property.typeName.unwrappedTypeName }}> = .noChange{% ifnot forloop.last %}, {% endif %}
         {% endif %}
         {% endfor %}
     ) -> {{ type.name }} {
