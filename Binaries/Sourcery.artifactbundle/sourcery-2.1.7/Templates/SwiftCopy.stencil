@@ -40,7 +40,8 @@ extension {{ type.name }} {
     public typealias {{ type.name }}OptionalCopy<T> = OptionalCopy<T>
     
     public func copy(
-        {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+        {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" and property.defaultValue == nil %}
+        
         {% ifnot property.isOptional %}
         {{ property.name }}: {{ property.typeName }}? = nil{% ifnot forloop.last %}, {% endif %}
         {% else %}
@@ -49,7 +50,7 @@ extension {{ type.name }} {
         {% endfor %}
     ) -> {{ type.name }} {
         return {{ type.name }}(
-            {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+            {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" and property.defaultValue == nil %}
             {% ifnot property.isOptional %}
             {{ property.name }}: {{ property.name }} ?? self.{{ property.name }}{% ifnot forloop.last %}, {% endif %}
             {% else %}
@@ -61,7 +62,7 @@ extension {{ type.name }} {
 }
 
 final class {{ type.name }}Builder: ObservableObject {
-    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" and property.defaultValue == nil %}
     private var _{{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %}
     
     var {{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}?{% endif %} {
@@ -79,7 +80,7 @@ final class {{ type.name }}Builder: ObservableObject {
     {% endfor %}
 
     func readyToBuild() -> Bool {
-    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" and property.isOptional == false %}
+    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" and property.defaultValue == nil and property.isOptional == false %}
         _{{ property.name }} != nil{% ifnot forloop.last %} &&{% endif %}
     {% endfor %}
     }
@@ -94,7 +95,7 @@ final class {{ type.name }}Builder: ObservableObject {
     
     func build() -> {{ type.name }} {
         {{ type.name }}(
-            {%- for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+            {%- for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" and property.defaultValue == nil %}
             {{ property.name }}: _{{ property.name }}{% ifnot forloop.last %}, {% endif %}
             {% endfor -%}
         )
