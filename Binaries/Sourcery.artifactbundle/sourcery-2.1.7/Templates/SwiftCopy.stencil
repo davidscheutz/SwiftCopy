@@ -109,6 +109,12 @@ protocol {{ type.name }}Changeable: ObservableObject {
     {% endfor %}
 }
 
+extension {{ type.name }} {
+    func updater() -> {{ type.name }}Updater {
+        .init({{ type.name|lowerFirstLetter }}: self)
+    }
+}
+
 final class {{ type.name }}Updater: {{ type.name }}Changeable {
     private let initial: {{ type.name }}
     
