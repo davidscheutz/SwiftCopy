@@ -90,9 +90,9 @@ final class SwiftCopyDemoTests: XCTestCase {
     }
     
     func test_updater() {
-        let user = User1(id: UUID().hashValue, firstName: "Test", lastName: "User", created: Date())
+        let initialUser = User1(id: UUID().hashValue, firstName: "Test", lastName: "User", created: Date())
         
-        let updater = user.updater()
+        let updater = initialUser.updater()
         
         XCTAssertFalse(updater.hasChanges())
         
@@ -100,7 +100,16 @@ final class SwiftCopyDemoTests: XCTestCase {
         updater.with(firstName: updatedFirstName)
         
         XCTAssertTrue(updater.hasChanges())
+        XCTAssertEqual(updater.build(), initialUser.copy(firstName: updatedFirstName))
         
-        XCTAssertEqual(updater.build(), user.copy(firstName: updatedFirstName))
+        updater.reset()
+        XCTAssertFalse(updater.hasChanges())
+        XCTAssertEqual(updater.build(), initialUser)
+        
+        let updatedUser = initialUser.copy(firstName: "New first name", lastName: "New last name")
+        updater.update(using: updatedUser)
+        
+        XCTAssertTrue(updater.hasChanges())
+        XCTAssertEqual(updater.build(), updatedUser)
     }
 }

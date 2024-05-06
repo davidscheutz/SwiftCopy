@@ -115,6 +115,12 @@ extension {{ type.name }} {
     }
 }
 
+{% macro assignProperties type source %}
+    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+        _{{ property.name }} = {{ source }}.{{ property.name }}
+    {% endfor %}
+{% endmacro %}
+
 final class {{ type.name }}Updater: {{ type.name }}Changeable {
     private let initial: {{ type.name }}
     
@@ -136,9 +142,7 @@ final class {{ type.name }}Updater: {{ type.name }}Changeable {
 
     init({{ type.name|lowerFirstLetter }}: {{ type.name }}) {
         self.initial = {{ type.name|lowerFirstLetter }}
-    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
-        _{{ property.name }} = {{ type.name|lowerFirstLetter }}.{{ property.name }}
-    {% endfor %}
+        {% call assignProperties type type.name|lowerFirstLetter %}
     }
     
     {% if type.based.Equatable %}
@@ -146,6 +150,14 @@ final class {{ type.name }}Updater: {{ type.name }}Changeable {
         initial != build()
     }
     {% endif %}
+    
+    func update(using {{ type.name|lowerFirstLetter }}: {{ type.name }}) {
+        {% call assignProperties type type.name|lowerFirstLetter %}
+    }
+    
+    func reset() {
+        update(using: initial)
+    }
     
     func build() -> {{ type.name }} {
         {{ type.name }}(
