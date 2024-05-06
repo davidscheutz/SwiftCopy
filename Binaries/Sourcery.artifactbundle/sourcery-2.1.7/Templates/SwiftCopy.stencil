@@ -110,6 +110,8 @@ protocol {{ type.name }}Changeable: ObservableObject {
 }
 
 final class {{ type.name }}Updater: {{ type.name }}Changeable {
+    private let initial: {{ type.name }}
+    
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
     private var _{{ property.name }}: {{ property.typeName }}
     var {{ property.name }}: {{ property.typeName }} {
@@ -127,10 +129,17 @@ final class {{ type.name }}Updater: {{ type.name }}Changeable {
     {% endfor %}
 
     init({{ type.name|lowerFirstLetter }}: {{ type.name }}) {
+        self.initial = {{ type.name|lowerFirstLetter }}
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
         _{{ property.name }} = {{ type.name|lowerFirstLetter }}.{{ property.name }}
     {% endfor %}
     }
+    
+    {% if type.based.Equatable %}
+    func hasChanges() -> Bool {
+        initial != build()
+    }
+    {% endif %}
     
     func build() -> {{ type.name }} {
         {{ type.name }}(
