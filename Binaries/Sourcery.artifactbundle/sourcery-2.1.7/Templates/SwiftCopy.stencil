@@ -125,13 +125,12 @@ final class {{ type.name }}Updater: {{ type.name }}Changeable {
     private let initial: {{ type.name }}
     
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
-    private var _{{ property.name }}: {{ property.typeName }}
+    private var _{{ property.name }}: {{ property.typeName }} {
+        willSet { objectWillChange.send() }
+    }
     var {{ property.name }}: {{ property.typeName }} {
         get { _{{ property.name }} }
-        set {
-            _{{ property.name }} = newValue
-            objectWillChange.send()
-        }
+        set { _{{ property.name }} = newValue }
     }
     @discardableResult
     func with({{ property.name }}: {{ property.typeName }}) -> Self {
