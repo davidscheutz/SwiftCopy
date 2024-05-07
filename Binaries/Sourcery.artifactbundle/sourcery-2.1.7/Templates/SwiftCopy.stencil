@@ -61,15 +61,17 @@ extension {{ type.name }} {
 }
 
 final class {{ type.name }}Builder: ObservableObject {
+    let objectDidChange = PassthroughSubject<Void, Never>()
+    
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
-    private var _{{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %}
+    private var _{{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %} {
+        willSet { objectWillChange.send() }
+        didSet { objectDidChange.send() }
+    }
     
     var {{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}?{% endif %} {
         get { _{{ property.name }} }
-        set {
-            _{{ property.name }} = newValue
-            objectWillChange.send()
-        }
+        set { _{{ property.name }} = newValue }
     }
     @discardableResult
     func with({{ property.name }}: {{ property.typeName }}) -> Self {
@@ -124,9 +126,12 @@ extension {{ type.name }} {
 final class {{ type.name }}Updater: {{ type.name }}Changeable {
     private let initial: {{ type.name }}
     
+    let objectDidChange = PassthroughSubject<Void, Never>()
+    
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
     private var _{{ property.name }}: {{ property.typeName }} {
         willSet { objectWillChange.send() }
+        didSet { objectDidChange.send() }
     }
     var {{ property.name }}: {{ property.typeName }} {
         get { _{{ property.name }} }
