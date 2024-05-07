@@ -125,13 +125,14 @@ extension {{ type.name }} {
 
 final class {{ type.name }}Updater: {{ type.name }}Changeable {
     private let initial: {{ type.name }}
+    private var notifyUpdates = true
     
     let objectDidChange = PassthroughSubject<Void, Never>()
     
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
     private var _{{ property.name }}: {{ property.typeName }} {
-        willSet { objectWillChange.send() }
-        didSet { objectDidChange.send() }
+        willSet { if notifyUpdates { objectWillChange.send() } }
+        didSet { if notifyUpdates { objectDidChange.send() } }
     }
     var {{ property.name }}: {{ property.typeName }} {
         get { _{{ property.name }} }
@@ -156,7 +157,13 @@ final class {{ type.name }}Updater: {{ type.name }}Changeable {
     {% endif %}
     
     func update(using {{ type.name|lowerFirstLetter }}: {{ type.name }}) {
+        notifyUpdates = false
+        objectWillChange.send()
+        
         {% call assignProperties type type.name|lowerFirstLetter %}
+        
+        notifyUpdates = true
+        objectDidChange.send()
     }
     
     func reset() {
