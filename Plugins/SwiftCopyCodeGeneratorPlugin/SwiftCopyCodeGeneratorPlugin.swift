@@ -29,6 +29,10 @@ extension SwiftCopyCodeGeneratorPlugin: XcodeBuildToolPlugin {
             .filter { !$0.path.string.contains(root.appending(subpath: target.displayName).string) }
             .forEach {
                 let new = $0.path.string.replacingOccurrences(of: "\(context.xcodeProject.directory.string)/", with: "")
+                
+                // skip build folder
+                guard !new.hasPrefix("build") else { return }
+                
                 if new.contains("/") {
                     paths.insert(String(new.split(separator: "/")[0]))
                 } else {
