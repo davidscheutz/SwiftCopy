@@ -93,14 +93,14 @@ struct OnboardingUser: Copyable {
 }
 ```
 
-Compile your project and a `OnboardingUserBuilder` will be generated for you. 
+Compile your project and a `Builder` type will be generated for every type that confirms to `Copyable`. 
 
-The builder can be used as followed:
+Each builder is nested within it's associated type and can be used as followed:
 
 **Builder pattern**
 
 ```swift
-let builder = OnboardingUserBuilder()
+let builder = OnboardingUser.Builder()
 
 let user = builder
     .with(firstName: "David")
@@ -112,7 +112,7 @@ let user = builder
 **Assign directly**
 
 ```swift
-let builder = OnboardingUserBuilder()
+let builder = OnboardingUser.Builder()
 
 builder.firstName = "David"
 builder.lastName = "Scheutz"
@@ -127,23 +127,31 @@ Note: The `build()` method force unwraps optional types and therefore will crash
 Similar to the Builder, this object can be used to mutate an existing struct.
 
 ```swift
-let updater = OnboardingUserUpdater(onboardingUser: existingUser)
+// Instantiate directly from Copyable instance
+let updater = existingUser.updater()
 
+// Instantiate using constructor
+let updater = OnboardingUser.Updater(onboardingUser: existingUser)
+```
+
+```swift
+// Usage via Builder pattern
 let updatedUser = updater
     .with(firstName: "David New")
     ...
     .build()
-```
 
-```swift
-let updater = OnboardingUserUpdater(onboardingUser: existingUser)
-
-updater.with(firstName: "David")
+// Usage via direct assignment
+updater.firstName = "David"
 ...
-let updatedUser = builder.build()
+let updatedUser = updater.build()
 ```
 
 Note: The `build()` method is safe to use, as all values are present at all times, due to the Updated being instantiated with an existing object. 
+
+#### Observable
+
+Both the `Builder` and the `Updater` implement `ObservableObject`. Additionally to the `objectWillChange` there is a `objectDidChange` subject, making it ideal to use within SwiftUI views as well as outside views.
 
 ## Installation
 
@@ -152,7 +160,7 @@ You can use the [Swift Package Manager](https://swift.org/package-manager/) to i
 
 ```swift
 dependencies: [
-    .package(url: "git@github.com:davidscheutz/SwiftCopy.git", from: "1.0.0")
+    .package(url: "git@github.com:davidscheutz/SwiftCopy.git", from: "1.2.0")
 ]
 ```
 
@@ -166,7 +174,7 @@ Select your Project -> Your Target -> Build Phases -> Add SwiftCopyCodeGenerator
 
 ## Demo Project
 
-Feel free to take a look at the `SwiftCopyDemo.xcodeproj` to see the library in action.
+Feel free to take a look at the `SwiftCopyDemo.xcodeproj` to see the library in action. The usage is demonstrated using tests, which can be found in `SwiftCopyDemoTests.swift` file.
 
 ## Contributing
 

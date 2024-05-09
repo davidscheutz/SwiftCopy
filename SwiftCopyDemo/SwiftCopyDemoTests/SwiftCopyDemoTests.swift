@@ -37,7 +37,7 @@ final class SwiftCopyDemoTests: XCTestCase {
         let id1 = UUID().hashValue
         let id2 = UUID().hashValue
         
-        let builder = User2Builder()
+        let builder = User2.Builder()
         
         XCTAssertFalse(builder.readyToBuild())
         
@@ -67,7 +67,7 @@ final class SwiftCopyDemoTests: XCTestCase {
         let id2 = UUID().hashValue
         let initialUser = User2(id: id1, name: "Test User", profilePicture: nil)
         
-        let updater = User2Updater(user2: initialUser)
+        let updater = initialUser.updater()
         
         var updatedUser = updater.build()
         
