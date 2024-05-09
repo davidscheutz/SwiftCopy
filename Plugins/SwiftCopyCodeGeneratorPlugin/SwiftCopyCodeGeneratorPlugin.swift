@@ -22,26 +22,51 @@ extension SwiftCopyCodeGeneratorPlugin: XcodeBuildToolPlugin {
         let toolPath = try context.tool(named: "sourcery")
         let templatesPath = toolPath.path.removingLastComponent().removingLastComponent().appending("Templates")
         
+        let root = context.xcodeProject.directory
+        var paths: Set<String> = [target.displayName]
+        
+        target.inputFiles
+            .filter { !$0.path.string.contains(root.appending(subpath: target.displayName).string) }
+            .forEach {
+                let new = $0.path.string.replacingOccurrences(of: "\(context.xcodeProject.directory.string)/", with: "")
+                if new.contains("/") {
+                    paths.insert(String(new.split(separator: "/")[0]))
+                } else {
+                    paths.insert(new)
+                }
+            }
+        
+        print("\(target.displayName) source file root directories: \(paths)")
+        
         return command(
             for: target,
             executable: toolPath.path,
             templates: templatesPath.string,
-            root: context.xcodeProject.directory,
+            root: root,
+            paths: paths,
             output: context.pluginWorkDirectory
         )
     }
     
-    private func command(for target: XcodeTarget, executable: Path, templates: String, root: Path, output: Path) -> Command {
-        Command.prebuildCommand(
+    private func command(for target: XcodeTarget, executable: Path, templates: String, root: Path, paths: Set<String>, output: Path) -> Command {
+        
+        var sources = [String]()
+        paths.forEach {
+            sources.append("--sources")
+            sources.append("\(root.appending(subpath: $0))")
+        }
+        
+        return Command.prebuildCommand(
             displayName: "SwiftCopy generate: \(target.displayName)",
             executable: executable,
             arguments: [
                 "--templates",
                 templates,
                 "--args",
-                "imports=[\"\(target.displayName)\"]",
-                "--sources",
-                root.appending(subpath: target.displayName),
+                "imports=[\"\(target.displayName)\"]"
+            ] +
+               sources
+            + [
                 "--output",
                 output,
                 "--disableCache",

@@ -62,15 +62,17 @@ extension {{ type.name }} {
 }
 
 final class {{ type.name }}Builder: ObservableObject {
+    let objectDidChange = PassthroughSubject<Void, Never>()
+    
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" and property.defaultValue == nil %}
-    private var _{{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %}
+    private var _{{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}!{% endif %} {
+        willSet { objectWillChange.send() }
+        didSet { objectDidChange.send() }
+    }
     
     var {{ property.name }}: {{ property.typeName }}{% ifnot property.isOptional %}?{% endif %} {
         get { _{{ property.name }} }
-        set {
-            _{{ property.name }} = newValue
-            objectWillChange.send()
-        }
+        set { _{{ property.name }} = newValue }
     }
     @discardableResult
     func with({{ property.name }}: {{ property.typeName }}) -> Self {
@@ -110,15 +112,32 @@ protocol {{ type.name }}Changeable: ObservableObject {
     {% endfor %}
 }
 
-final class {{ type.name }}Updater: {{ type.name }}Changeable {
+extension {{ type.name }} {
+    func updater() -> {{ type.name }}Updater {
+        .init({{ type.name|lowerFirstLetter }}: self)
+    }
+}
+
+{% macro assignProperties type source %}
     {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
-    private var _{{ property.name }}: {{ property.typeName }}
+        _{{ property.name }} = {{ source }}.{{ property.name }}
+    {% endfor %}
+{% endmacro %}
+
+final class {{ type.name }}Updater: {{ type.name }}Changeable {
+    private let initial: {{ type.name }}
+    private var notifyUpdates = true
+    
+    let objectDidChange = PassthroughSubject<Void, Never>()
+    
+    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
+    private var _{{ property.name }}: {{ property.typeName }} {
+        willSet { if notifyUpdates { objectWillChange.send() } }
+        didSet { if notifyUpdates { objectDidChange.send() } }
+    }
     var {{ property.name }}: {{ property.typeName }} {
         get { _{{ property.name }} }
-        set {
-            _{{ property.name }} = newValue
-            objectWillChange.send()
-        }
+        set { _{{ property.name }} = newValue }
     }
     @discardableResult
     func with({{ property.name }}: {{ property.typeName }}) -> Self {
@@ -128,9 +147,28 @@ final class {{ type.name }}Updater: {{ type.name }}Changeable {
     {% endfor %}
 
     init({{ type.name|lowerFirstLetter }}: {{ type.name }}) {
-    {% for property in type.variables|instance|!computed where property.readAccess != "private" and property.readAccess != "fileprivate" %}
-        _{{ property.name }} = {{ type.name|lowerFirstLetter }}.{{ property.name }}
-    {% endfor %}
+        self.initial = {{ type.name|lowerFirstLetter }}
+        {% call assignProperties type type.name|lowerFirstLetter %}
+    }
+    
+    {% if type.based.Equatable %}
+    func hasChanges() -> Bool {
+        initial != build()
+    }
+    {% endif %}
+    
+    func update(using {{ type.name|lowerFirstLetter }}: {{ type.name }}) {
+        notifyUpdates = false
+        objectWillChange.send()
+        
+        {% call assignProperties type type.name|lowerFirstLetter %}
+        
+        notifyUpdates = true
+        objectDidChange.send()
+    }
+    
+    func reset() {
+        update(using: initial)
     }
     
     func build() -> {{ type.name }} {
