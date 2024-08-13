@@ -26,7 +26,10 @@ extension SwiftCopyCodeGeneratorPlugin: XcodeBuildToolPlugin {
         var paths: Set<String> = [target.displayName]
         
         target.inputFiles
-            .filter { !$0.path.string.contains(root.appending(subpath: target.displayName).string) }
+            .filter {
+                $0.path.string.contains(root.appending(subpath: target.displayName).string) == false
+                && ($0.path.string.hasPrefix("Applications/") && $0.path.string.hasSuffix(".framework")) == false
+            }
             .forEach {
                 var new = $0.path.string.replacingOccurrences(of: "\(context.xcodeProject.directory.string)/", with: "")
                 
