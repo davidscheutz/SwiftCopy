@@ -25,18 +25,21 @@ extension SwiftCopyCodeGeneratorPlugin: XcodeBuildToolPlugin {
         let root = context.xcodeProject.directory
         var paths: Set<String> = [target.displayName]
         
+        let targetPath = root.appending(subpath: target.displayName).string
+        
         target.inputFiles
-            .filter { !$0.path.string.contains(root.appending(subpath: target.displayName).string) }
+            .filter { $0.path.string.hasPrefix(targetPath) && $0.path.string.hasSuffix(".swift") }
             .forEach {
-                let new = $0.path.string.replacingOccurrences(of: "\(context.xcodeProject.directory.string)/", with: "")
+                var new = $0.path.string.replacingOccurrences(of: "\(root.string)/", with: "")
                 
                 // skip build folder
                 guard !new.hasPrefix("build") else { return }
                 
                 if new.contains("/") {
-                    paths.insert(String(new.split(separator: "/")[0]))
-                } else {
-                    paths.insert(new)
+                    new = String(new.split(separator: "/")[0])
+                }
+                if paths.insert(new).inserted {
+                    print("Found additional directory: '\(new)' for file: \($0.path)")
                 }
             }
         
