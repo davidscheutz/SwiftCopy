@@ -23,9 +23,12 @@ struct User2: Equatable, Copyable {
 
 struct User3: Equatable, Copyable {
     let id: Int
-
+    /// This should not generate a copy function because this property can't be assigned via constructor
+    let hash: String
+    
     init(id: Int) {
         self.id = id
+        hash = "\(id.hashValue)"
     }
     
     /// This should not generate a copy function because it's a private property
