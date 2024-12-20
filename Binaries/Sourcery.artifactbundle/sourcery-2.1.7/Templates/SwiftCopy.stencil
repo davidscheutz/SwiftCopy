@@ -34,7 +34,7 @@ public enum OptionalCopy<T> {
         {% ifnot property.isOptional %}
         {{ property.name }}: {{ property.typeName }}? = nil{% ifnot isLast %}, {% endif %}
         {% else %}
-        {{ property.name }}: {{ type.name }}OptionalCopy<{{ property.typeName.unwrappedTypeName }}> = .noChange{% ifnot isLast %}, {% endif %}
+        {{ property.name }}: OptionalCopy<{{ property.typeName.unwrappedTypeName }}> = .noChange{% ifnot isLast %}, {% endif %}
         {% endif %}
 {% endmacro %}
 
@@ -69,8 +69,6 @@ import SwiftUI
 // MARK: {{ type.name }} - Copy
 
 extension {{ type.name }} {
-    public typealias {{ type.name }}OptionalCopy<T> = OptionalCopy<T>
-    
     public func copy(
         {% call iterate type funcParameter %}
     ) -> {{ type.name }} {
