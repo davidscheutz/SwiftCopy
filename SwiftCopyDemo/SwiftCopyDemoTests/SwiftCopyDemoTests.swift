@@ -13,10 +13,11 @@ final class SwiftCopyDemoTests: XCTestCase {
     func test_copy() {
         let id = UUID().hashValue
         let now = Date()
-        let user = User1(id: id, firstName: "Test", lastName: "User", created: now)
-        let updatedUser = User1(id: id, firstName: "Updated Test", lastName: "Updated User", created: now)
+        let user = User1(id: id, name: .init(first: "Test", last: "User"), created: now)
+        let updatedName = User1.Name(first: " Updated Test", last: "Updated User")
+        let updatedUser = User1(id: id, name: updatedName, created: now)
         
-        XCTAssertEqual(user.copy(firstName: "Updated Test", lastName: "Updated User"), updatedUser)
+        XCTAssertEqual(user.copy(name: updatedName), updatedUser)
     }
     
     func test_optionalCopy() {
@@ -90,23 +91,23 @@ final class SwiftCopyDemoTests: XCTestCase {
     }
     
     func test_updater() {
-        let initialUser = User1(id: UUID().hashValue, firstName: "Test", lastName: "User", created: Date())
+        let initialUser = User1(id: UUID().hashValue, name: .init(first: "Test", last: "User"), created: Date())
         
         let updater = initialUser.updater()
         
         XCTAssertFalse(updater.hasChanges())
         
         let updatedFirstName = "Updated First Name"
-        updater.with(firstName: updatedFirstName)
+        updater.with(name: initialUser.name.copy(first: updatedFirstName))
         
         XCTAssertTrue(updater.hasChanges())
-        XCTAssertEqual(updater.build(), initialUser.copy(firstName: updatedFirstName))
+        XCTAssertEqual(updater.build(), initialUser.copy(name: initialUser.name.copy(first: updatedFirstName)))
         
         updater.reset()
         XCTAssertFalse(updater.hasChanges())
         XCTAssertEqual(updater.build(), initialUser)
         
-        let updatedUser = initialUser.copy(firstName: "New first name", lastName: "New last name")
+        let updatedUser = initialUser.copy(name: .init(first: "New first name", last: "New last name"))
         updater.update(using: updatedUser)
         
         XCTAssertTrue(updater.hasChanges())

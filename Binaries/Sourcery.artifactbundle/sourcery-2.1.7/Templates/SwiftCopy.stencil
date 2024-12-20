@@ -149,12 +149,14 @@ import Combine
 {% endmacro %}
 
 {% macro sourceAssignment type property isLast %}
-            _{{ property.name }} = {{ type.name|lowerFirstLetter }}.{{ property.name }}
+            _{{ property.name }} = {% call parameterNameFromType type %}.{{ property.name }}
 {% endmacro %}
 
 {% macro assignProperties type %}
     {% call iterate type sourceAssignment %}
 {% endmacro %}
+
+{% macro parameterNameFromType type %}{{ type.name|replace:".",""|lowerFirstLetter }}{% endmacro %}
 
 {% macro updaterSetter type property isLast %}
         private var _{{ property.name }}: {{ property.typeName }} {
@@ -181,7 +183,7 @@ extension {{ type.name }} {
     }
     
     func updater() -> Updater {
-        .init({{ type.name|lowerFirstLetter }}: self)
+        .init({% call parameterNameFromType type %}: self)
     }
 
     final class Updater: Changeable {
@@ -192,8 +194,8 @@ extension {{ type.name }} {
     
         {% call iterate type updaterSetter %}
 
-        init({{ type.name|lowerFirstLetter }}: {{ type.name }}) {
-            self.initial = {{ type.name|lowerFirstLetter }}
+        init({% call parameterNameFromType type %}: {{ type.name }}) {
+            self.initial = {% call parameterNameFromType type %}
             {% call assignProperties type %}
         }
     
@@ -203,7 +205,7 @@ extension {{ type.name }} {
         }
     {% endif %}
     
-        func update(using {{ type.name|lowerFirstLetter }}: {{ type.name }}) {
+        func update(using {% call parameterNameFromType type %}: {{ type.name }}) {
             notifyUpdates = false
             objectWillChange.send()
             

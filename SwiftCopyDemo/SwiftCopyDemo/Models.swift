@@ -9,9 +9,13 @@ import Foundation
 import SwiftCopy
 
 struct User1: Equatable, Copyable {
+    struct Name: Equatable, Copyable {
+        let first: String
+        let last: String
+    }
+    
     let id: Int
-    let firstName: String
-    let lastName: String
+    let name: Name
     let created: Date
 }
 
